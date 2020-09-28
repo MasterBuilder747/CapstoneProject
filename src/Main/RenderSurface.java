@@ -10,8 +10,7 @@ public class RenderSurface extends WritableImage {
 	
 	private int surface[][];
 	
-	public RenderSurface(int width, int height)
-	{
+	public RenderSurface(int width, int height) {
 		super(width, height);
 		surface = new int[height][width];
 		for (int i = 0; i < height; ++i) {
@@ -22,13 +21,11 @@ public class RenderSurface extends WritableImage {
 		insertArray();
 	}
 	
-	public int[][] getSurface()
-	{
+	public int[][] getSurface() {
 		return surface;
 	}
 	
-    public void insertArray()
-    {
+    public void insertArray() {
         //Creating a writable image 
     	int height = surface.length;
     	int width = surface[0].length;
@@ -46,8 +43,7 @@ public class RenderSurface extends WritableImage {
 
     }
     
-	public BufferedImage toImage() 
-	{
+	public BufferedImage toImage() {
 		BufferedImage bi = new BufferedImage(surface[0].length, surface.length, BufferedImage.TYPE_INT_RGB);
     	
     	// -- prepare output image
@@ -61,6 +57,4 @@ public class RenderSurface extends WritableImage {
 
     	return bi;
 	}
-
-
 }
