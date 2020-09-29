@@ -17,14 +17,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class GraphicsSwing extends JFrame {
 
-    private int WIDTH = 1024;
-    private int HEIGHT = 512;
-	
 	private final GraphicPanelInner graphicsPanel;
 	private ControlPanelInner controlPanel;
 
 	public GraphicsSwing () {
 		setTitle("Capstone Project");
+		int HEIGHT = 512;
+		int WIDTH = 572;
 		setSize(WIDTH, HEIGHT);
 		
 		// -- center the frame on the screen
@@ -214,12 +213,14 @@ public class GraphicsSwing extends JFrame {
 								BufferedImage bi;
 								try {
 									bi = Utilities.ImageRead(file);
-									buttons[1].setEnabled(true);
 									graphicsPanel.renderSurface.clearSurface();
-									//Utilities.renderImage(bi, graphicsPanel.renderSurface.getSurface());
+									System.out.println(bi.toString());
+
+									Utilities.renderImage(bi, graphicsPanel.renderSurface.getSurface());
 									graphicsPanel.renderSurface.insertArray();
 									graphicsPanel.repaint();
-
+									graphicsPanel.requestFocus();
+									buttons[1].setEnabled(true);
 								} catch (IOException e) {
 									e.printStackTrace();
 								}

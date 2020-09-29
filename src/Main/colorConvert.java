@@ -8,8 +8,8 @@ public class colorConvert {
         int r = (int)c.getRed() * 255;
         int g = (int)c.getGreen() * 255;
         int b = (int)c.getBlue() * 255;
-        int a = (int)c.getOpacity() * 255;
-        return (a << 24) | (r << 16) | (g << 8) | b;
+        //int a = (int)c.getOpacity() * 255;
+        return (r << 16) | (g << 8) | b;
     }
 
     public static Color IntToRGB(int c) {
@@ -20,4 +20,16 @@ public class colorConvert {
         //this returns a hex value
         return Color.rgb(r, g, b, a);
     }
+
+    public static String toString(Color c) {
+        int r = (int)c.getRed() * 255;
+        int g = (int)c.getGreen() * 255;
+        int b = (int)c.getBlue() * 255;
+        int a = (int)c.getOpacity();
+        return r + ", " + b + ", " + g + ", " + a;
+    }
+
+//    public static void main(String[] args) {
+//        System.out.println((int)Long.parseLong(Color.rgb(255, 0, 0, 1.0).toString(), 16));
+//    }
 }

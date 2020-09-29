@@ -1,5 +1,7 @@
 package Main;
 
+import javafx.scene.paint.Color;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -8,10 +10,14 @@ import java.io.IOException;
 
 public class Utilities {
     //IMAGE RENDERING
-    public static void renderImage(BufferedImage bi, int[][] fb) {
-        for (int i = 0; i < fb.length; i++) {
-            for (int j = 0; j < fb[0].length; j++) {
-                fb[i][j] = bi.getRGB(i, j);
+    public static void renderImage(BufferedImage bi, FrameBuffer fb) {
+        for (int i = 0; i < bi.getWidth(); i++) {
+            for (int j = 0; j < bi.getHeight(); j++) {
+                //System.out.println(Math.abs(bi.getRGB(i, j)));
+                fb.writePixel(i, j, colorConvert.IntToRGB(bi.getRGB(i, j)));
+                //fb.writePixel(i, j, Color.rgb(255, 0, 0, 1.0));
+                //System.out.println(((Math.abs(bi.getRGB(i, j)))));
+                //System.out.println(colorConvert.toString((colorConvert.IntToRGB(16711680))));
             }
         }
     }

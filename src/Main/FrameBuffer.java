@@ -27,7 +27,7 @@ public class FrameBuffer {
         this.fb[x][y][0] = c.getRed();
         this.fb[x][y][1] = c.getGreen();
         this.fb[x][y][2] = c.getBlue();
-        this.fb[x][y][3] = c.getOpacity();
+        this.fb[x][y][3] = 1.0;//c.getOpacity();
     }
 
     public Color readPixel(int x, int y) {
