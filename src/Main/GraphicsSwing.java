@@ -1,11 +1,6 @@
 package Main;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -13,63 +8,39 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.Timer;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class GraphicsSwing extends JFrame {
 
-    private int WIDTH = 512;
-    private int HEIGHT = 256;
-
-	private Timer animationTimer = null;	
+    private int WIDTH = 1024;
+    private int HEIGHT = 512;
 	
-	private GraphicPanelInner graphicsPanel;
+	private final GraphicPanelInner graphicsPanel;
 	private ControlPanelInner controlPanel;
-	
+
 	public GraphicsSwing () {
 		setTitle("Capstone Project");
-
-		// -- size of the frame: width, height
 		setSize(WIDTH, HEIGHT);
 		
 		// -- center the frame on the screen
 		setLocationRelativeTo(null);
-		
-		// -- shut down the entire application when the frame is closed
-		//    if you don't include this the application will continue to
-		
-		//    run in the background and you'll have to kill it by pressing
-		//    the red square in eclipse
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// -- set the layout manager and add items
 		//    5, 5 is the border around the edges of the areas
 		setLayout(new BorderLayout(5, 5));
-
 		graphicsPanel = new GraphicPanelInner(WIDTH, HEIGHT);
 		this.add(graphicsPanel, BorderLayout.CENTER);
-		
 		controlPanel = new ControlPanelInner();
 		this.add(controlPanel, BorderLayout.WEST);
 
-		// -- Timer will generate an event every 10mSec once it is started
-		//    First parameter is the delay in mSec, second is the ActionListener
-		animationTimer = new Timer(10,
-				// -- ActionListener for the timer event
-				new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						System.out.println("tic");
-					}
-				}
-		);
-
         // -- paint the graphics canvas before the initial display
         graphicsPanel.repaint();
-        
 		// -- show the frame on the screen
 		setVisible(true);
 	
@@ -84,13 +55,9 @@ public class GraphicsSwing extends JFrame {
 
     	private RenderSurface renderSurface;
 
-    	public Timer getAnimationTimer() {
-			return animationTimer;
-		}
-
 		public GraphicPanelInner (int width, int height) {
 			super();
-			this.setBackground(Color.white);
+			this.setBackground(Color.DARK_GRAY);
 			prepareActionHandlers();
 			
 			this.addMouseMotionListener(this);
@@ -197,14 +164,13 @@ public class GraphicsSwing extends JFrame {
 
         	graphicsContext.drawImage(renderSurface.toImage(), 0, 0, this.getWidth(), this.getHeight(), null);
  		}
-
 	}
 	
 	// -- Inner class for control panel
 	public class ControlPanelInner extends JPanel {
 
-		private int nButtons = 6;
-		private JButton buttons[];
+		private JButton[] buttons;
+		private int nButtons = 3;
 
 		JTextField textField;
 
@@ -216,36 +182,94 @@ public class GraphicsSwing extends JFrame {
 			setLayout(new GridLayout(10, 1, 2, 2));
 			for (int i = 0; i < buttons.length; ++i) {
 				this.add(buttons[i]);
-				if (i == 1) {
-					textField = new JTextField();
-					//textField.setWidth(60);
-					this.add(textField);
-				}
+//				if (i == 1) {
+//					textField = new JTextField();
+//					//textField.setWidth(60);
+//					this.add(textField);
+//				}
 			}
 		}
 
 		private void prepareButtonHandlers() {
 			buttons = new JButton[nButtons];
+
+
 			for (int i = 0; i < buttons.length; ++i) {
-				buttons[i] = new JButton();
-				buttons[i].setText("Button " + i);
-				buttons[i].addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent actionEvent) {
+				if (i == 0) {
+					buttons[i] = new JButton();
+					buttons[i].setText("Load Image");
+					buttons[i].setEnabled(true);
+					buttons[i].addActionListener(actionEvent -> {
 						if (actionEvent.getSource() == buttons[0]) {
-							animationTimer.start();
-						} else if (actionEvent.getSource() == buttons[nButtons - 1]) {
-							animationTimer.stop();
-						} else if (actionEvent.getSource() == buttons[1]) {
-							System.out.println(textField.getText());
+							JFileChooser fc = new JFileChooser();
+							FileNameExtensionFilter filter = new FileNameExtensionFilter(
+									"JPG & PNG Images", "jpg", "png");
+							fc.setFileFilter(filter);
+							fc.setCurrentDirectory(new File(System.getProperty("user.home")));
+							int returnVal = fc.showOpenDialog(null);
+							if (returnVal == JFileChooser.APPROVE_OPTION) {
+								//This is where a real application would open the file.
+								File file = fc.getSelectedFile();
+								String fileName = file.getAbsolutePath();
+								BufferedImage bi;
+								try {
+									bi = Utilities.ImageRead(file);
+									buttons[1].setEnabled(true);
+									graphicsPanel.renderSurface.clearSurface();
+									//Utilities.renderImage(bi, graphicsPanel.renderSurface.getSurface());
+									graphicsPanel.renderSurface.insertArray();
+									graphicsPanel.repaint();
+
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+								//System.out.println("File saved in: " + fileName);
+							} else {
+								//error
+							}
 						}
-						// -- process the button
-						System.out.println(actionEvent.getSource().toString());
+					});
+				}
+				if (i == 1) {
+					buttons[i] = new JButton();
+					buttons[i].setText("Copy Image");
+					buttons[i].setEnabled(false);
+					buttons[i].addActionListener(actionEvent -> {
+						if (actionEvent.getSource() == buttons[1]) {
+							//display the image again
+							buttons[2].setEnabled(true);
 
-						// -- and return focus back to the graphics panel
-						graphicsPanel.requestFocus();
-
-					}
-				});
+						}
+					});
+				}
+				if (i == 2) {
+					buttons[i] = new JButton();
+					buttons[i].setText("Save Image");
+					buttons[i].setEnabled(false);
+					buttons[i].addActionListener(actionEvent -> {
+						if (actionEvent.getSource() == buttons[2]) {
+							// save as png
+							//FileChooser is the method to make a dialog to find a place to save the file
+							JFileChooser fc = new JFileChooser();
+							fc.setCurrentDirectory(new File(System.getProperty("user.home")));
+							int returnVal = fc.showSaveDialog(null);
+							if (returnVal == JFileChooser.APPROVE_OPTION) {
+								//This is where a real application would open the file.
+								File file = fc.getSelectedFile();
+								String fileName = file.getAbsolutePath();
+								int[][] im = new int[512][512];
+								try {
+									Utilities.ImageWrite(im, fileName + ".png");
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+								//System.out.println("File saved in: " + fileName);
+							} else {
+								//error
+							}
+						}
+					});
+				}
 			}
 		}
 
