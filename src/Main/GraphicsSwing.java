@@ -1,8 +1,6 @@
 package Main;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -23,7 +21,7 @@ public class GraphicsSwing extends JFrame {
 	public GraphicsSwing () {
 		setTitle("Capstone Project");
 		int HEIGHT = 512;
-		int WIDTH = 572;
+		int WIDTH = 512;
 		setSize(WIDTH, HEIGHT);
 		
 		// -- center the frame on the screen
@@ -209,7 +207,7 @@ public class GraphicsSwing extends JFrame {
 							if (returnVal == JFileChooser.APPROVE_OPTION) {
 								//This is where a real application would open the file.
 								File file = fc.getSelectedFile();
-								String fileName = file.getAbsolutePath();
+								//String fileName = file.getAbsolutePath();
 								BufferedImage bi;
 								try {
 									bi = Utilities.ImageRead(file);
