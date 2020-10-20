@@ -11,11 +11,11 @@ public class RenderSurface extends WritableImage {
 	private final FrameBuffer surface;
 
 	//initial image when starting
-	public RenderSurface(int width, int height) {
-		super(width, height);
-		this.surface = new FrameBuffer(width, height);
-		for (int i = 0; i < width; ++i) {
-			for (int j = 0; j < height; ++j) {
+	public RenderSurface(int height, int width) {
+		super(height, width);
+		this.surface = new FrameBuffer(height, width);
+		for (int i = 0; i < height; ++i) {
+			for (int j = 0; j < width; ++j) {
 				surface.writePixel(i, j, new Pixel(255, 0, 0, 0).toInt());
 			}
 		}
@@ -48,7 +48,7 @@ public class RenderSurface extends WritableImage {
     }
 
 	public BufferedImage toImage() {
-		BufferedImage bi = new BufferedImage(surface.length(0), surface.length(), BufferedImage.TYPE_INT_RGB);
+		BufferedImage bi = new BufferedImage(surface.length(), surface.length(0), BufferedImage.TYPE_INT_ARGB);
     	
     	// -- prepare output image
     	for (int i = 0; i < bi.getHeight(); ++i) {

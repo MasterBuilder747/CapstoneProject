@@ -15,7 +15,19 @@ public class Utilities {
         | (getBlue(inData) << 0);
     }
     */
-    public static void renderImage(BufferedImage bi, FrameBuffer fb) {
+    public static void copyFrameBuffer(FrameBuffer fb1, FrameBuffer fb2) {
+        if (fb1.length() == fb2.length() && fb1.length(0) == fb2.length(0)) {
+            for (int i = 0; i < fb1.length(); i++) {
+                for (int j = 0; j < fb1.length(0); j++) {
+                    fb2.writePixel(i, j, fb1.readPixel(i, j));
+                }
+            }
+        } else {
+            throw new ArrayIndexOutOfBoundsException("FrameBuffer sizes do not match.");
+        }
+    }
+    public static FrameBuffer BiToFB(BufferedImage bi) {
+        FrameBuffer fb = new FrameBuffer(bi.getHeight(), bi.getWidth());
         for (int i = 0; i < bi.getWidth(); i++) {
             for (int j = 0; j < bi.getHeight(); j++) {
                 //System.out.println(Math.abs(bi.getRGB(i, j)));
@@ -25,42 +37,40 @@ public class Utilities {
                 //System.out.println(colorConvert.toString((colorConvert.IntToRGB(16711680))));
             }
         }
+        return fb;
     }
 
     //FILES
-    //read the framebuffer from file
+    //load image
     public static BufferedImage ImageRead(File file) throws IOException {
         BufferedImage bfile = ImageIO.read(file);
-        int[][] img = new int[bfile.getWidth()][bfile.getHeight()];
-        BufferedImage bi = new BufferedImage(img[0].length, img.length, BufferedImage.TYPE_INT_RGB);
+        int[][] img = new int[bfile.getHeight()][bfile.getWidth()];
+        BufferedImage bi = new BufferedImage(img[0].length, img.length, BufferedImage.TYPE_INT_ARGB);
 
-        // -- prepare output image
         for (int i = 0; i < bi.getHeight(); ++i) {
             for (int j = 0; j < bi.getWidth(); ++j) {
-                int pixel =	(img[i][j] << 16) | (img[i][j] << 8) | (img[i][j]);
-                // int pixel =	((int)(Math.random() * 255) << 16) | (img[i][j] << 8) | (img[i][j]);
-                bi.setRGB(j, i, pixel);
+                int pixel =	(img[i][j] << 24) | (img[i][j] << 16) | (img[i][j] << 8) | (img[i][j]);
+                bi.setRGB(i, j, pixel);
             }
         }
-
-        // -- write output image
-        //ImageIO.write(bi, "png", outputFile);
         return ImageIO.read(file);
     }
-    public static void ImageWrite(int[][] img, String filename) throws IOException {
-        BufferedImage bi = new BufferedImage(img[0].length, img.length, BufferedImage.TYPE_INT_RGB);
+    //save image
+    //bi: the loaded image format
+    //fb: the converted framebuffer that will write a new saving bi to
+    public static void ImageWrite(BufferedImage bi1, FrameBuffer fb, String filename) throws IOException {
+        BufferedImage bi2 = new BufferedImage(fb.length(), fb.length(0), bi1.getType());
+        //int[][] fb2 = fb.returnFB();
 
-        // -- prepare output image
-        for (int i = 0; i < bi.getHeight(); ++i) {
-            for (int j = 0; j < bi.getWidth(); ++j) {
-                int pixel =	(img[i][j] << 16) | (img[i][j] << 8) | (img[i][j]);
-                // int pixel =	((int)(Math.random() * 255) << 16) | (img[i][j] << 8) | (img[i][j]);
-                bi.setRGB(j, i, pixel);
+        for (int i = 0; i < bi2.getHeight(); ++i) {
+            for (int j = 0; j < bi2.getWidth(); ++j) {
+                //a, r, g, b
+                //int pixel =	(fb2[i][j] << 24) | (fb2[i][j] << 16) | (fb2[i][j] << 8) | (fb2[i][j]);
+                bi2.setRGB(i, j, fb.readPixel(i, j));
             }
         }
-
-        // -- write output image
+        //save the file
         File outputFile = new File(filename);
-        ImageIO.write(bi, "png", outputFile);
+        ImageIO.write(bi2, "png", outputFile);
     }
 }

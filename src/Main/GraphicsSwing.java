@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -17,6 +18,13 @@ public class GraphicsSwing extends JFrame {
 
 	private final GraphicPanelInner graphicsPanel;
 	private ControlPanelInner controlPanel;
+
+	//the loaded image, does not get modified
+	public FrameBuffer inImg;
+	public BufferedImage inBI;
+	//the saving image, this is the modified inImg
+	public FrameBuffer outImg;
+	public BufferedImage outBI;
 
 	public GraphicsSwing () {
 		setTitle("Capstone Project");
@@ -190,7 +198,6 @@ public class GraphicsSwing extends JFrame {
 		private void prepareButtonHandlers() {
 			buttons = new JButton[nButtons];
 
-
 			for (int i = 0; i < buttons.length; ++i) {
 				if (i == 0) {
 					buttons[i] = new JButton();
@@ -208,13 +215,15 @@ public class GraphicsSwing extends JFrame {
 								//This is where a real application would open the file.
 								File file = fc.getSelectedFile();
 								//String fileName = file.getAbsolutePath();
-								BufferedImage bi;
 								try {
-									bi = Utilities.ImageRead(file);
+									inBI = ImageIO.read(file);//Utilities.ImageRead(file);
+									System.out.println(inBI.toString());
+									//store the loaded image into the global loading fb
+									inImg = Utilities.BiToFB(inBI);
+									outImg = new FrameBuffer(inBI.getHeight(), inBI.getWidth());
+									//then render it
 									graphicsPanel.renderSurface.clearSurface();
-									System.out.println(bi.toString());
-
-									Utilities.renderImage(bi, graphicsPanel.renderSurface.getSurface());
+									Utilities.copyFrameBuffer(inImg, graphicsPanel.renderSurface.getSurface());
 									graphicsPanel.renderSurface.insertArray();
 									graphicsPanel.repaint();
 									graphicsPanel.requestFocus();
@@ -222,9 +231,6 @@ public class GraphicsSwing extends JFrame {
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
-								//System.out.println("File saved in: " + fileName);
-							} else {
-								//error
 							}
 						}
 					});
@@ -237,6 +243,7 @@ public class GraphicsSwing extends JFrame {
 						if (actionEvent.getSource() == buttons[1]) {
 							//display the image again
 							buttons[2].setEnabled(true);
+							Utilities.copyFrameBuffer(inImg, outImg);
 
 						}
 					});
@@ -256,15 +263,14 @@ public class GraphicsSwing extends JFrame {
 								//This is where a real application would open the file.
 								File file = fc.getSelectedFile();
 								String fileName = file.getAbsolutePath();
-								int[][] im = new int[512][512];
+
 								try {
-									Utilities.ImageWrite(im, fileName + ".png");
+									Utilities.ImageWrite(inBI, outImg, fileName + ".png");
+
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
-								//System.out.println("File saved in: " + fileName);
-							} else {
-								//error
+								System.out.println("File saved in: " + fileName);
 							}
 						}
 					});

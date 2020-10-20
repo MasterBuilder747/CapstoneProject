@@ -2,15 +2,14 @@ package Main;
 
 public class FrameBuffer {
 
-    //this is a 2D representation of a 0 to 255 colored pixel
-    //r, g, b, alpha(true double)
-    //Now using aRGB int (32-bit)
+    //this is a 2D representation of a 32 bit colored pixel array
+    //a, r, g, b
     private final int[][] fb;
 
-    public FrameBuffer(int w, int h) {
+    public FrameBuffer(int h, int w) {
         //all values are set to 0 by default
         //Red, Green, Blue, Opacity (all are 0-255, 32 bit in total)
-        this.fb = new int[w][h];
+        this.fb = new int[h][w];
     }
 
     public void writePixel(int x, int y, int p) {
@@ -28,6 +27,10 @@ public class FrameBuffer {
     }
     public int length(int i) {
         return this.fb[i].length;
+    }
+
+    public int[][] returnFB() {
+        return this.fb;
     }
 
     //this overrides all of the pixels with this one color
