@@ -24,9 +24,15 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class GraphicsJavaFX extends Application {
     int WIDTH = 512;
@@ -173,6 +179,7 @@ public class GraphicsJavaFX extends Application {
             //textboxes and enter buttons
             for (int i = 0; i < buttons.length; ++i) {
                 buttons[i] = new Button();
+                buttons[i].setDisable(true);
                 buttons[i].setMnemonicParsing(true);
                 buttons[i].setText("Enter box " + i + ":"); //trans (x,y,z) and rotate (deg)
                 buttons[i].setOnAction(actionEvent -> {
@@ -195,11 +202,34 @@ public class GraphicsJavaFX extends Application {
             //action buttons
             int i = 3;
             buttons[i] = new Button();
+            buttons[i].setDisable(false);
             buttons[i].setMnemonicParsing(true);
             buttons[i].setText("Load");
             buttons[i].setOnAction(actionEvent -> {
                 if (actionEvent.getSource() == buttons[3]) {
-
+                    FileChooser fc = new FileChooser();
+                        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(
+                                "JPG & PNG Images", "jpg", "png");
+                        fc.setSelectedExtensionFilter(filter);
+                        fc.setInitialDirectory(new File(System.getProperty("user.home")));
+                        File f = fc.showOpenDialog(null);
+                        try {
+                            inBI = ImageIO.read(f);//Utilities.ImageRead(file);
+                            System.out.println(inBI.toString());
+                            //store the loaded image into the global loading fb
+                            inImg = Utilities.BiToFB(inBI);
+                            outImg = new FrameBuffer(inBI.getHeight(), inBI.getWidth());
+                            //then render it
+                            graphicsCanvas.renderSurface.clearSurface();
+                            Utilities.copyFrameBuffer(inImg, graphicsCanvas.renderSurface.getSurface());
+                            graphicsCanvas.renderSurface.insertArray();
+                            graphicsCanvas.repaint();
+                            graphicsCanvas.requestFocus();
+                            buttons[4].setDisable(false);
+                            buttons[5].setDisable(false);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                 }
                 // focus back to the pane
                 pane.requestFocus();
@@ -207,11 +237,13 @@ public class GraphicsJavaFX extends Application {
 
             i = 4;
             buttons[i] = new Button();
+            buttons[i].setDisable(true);
             buttons[i].setMnemonicParsing(true);
-            buttons[i].setText("Translate");
+            buttons[i].setText("Copy");
             buttons[i].setOnAction(actionEvent -> {
                 if (actionEvent.getSource() == buttons[4]) {
-
+                    buttons[6].setDisable(false);
+                    Utilities.copyFrameBuffer(inImg, outImg);
                 }
                 // focus back to the pane
                 pane.requestFocus();
@@ -219,11 +251,14 @@ public class GraphicsJavaFX extends Application {
 
             i = 5;
             buttons[i] = new Button();
+            buttons[i].setDisable(true);
             buttons[i].setMnemonicParsing(true);
-            buttons[i].setText("Scale");
+            buttons[i].setText("Resize");
             buttons[i].setOnAction(actionEvent -> {
                 if (actionEvent.getSource() == buttons[5]) {
-
+                    //display the image again
+                    buttons[6].setDisable(false);
+                    outImg = new FrameBuffer(inBI.getHeight(), inBI.getWidth());
                 }
                 // focus back to the pane
                 pane.requestFocus();
@@ -231,16 +266,31 @@ public class GraphicsJavaFX extends Application {
 
             i = 6;
             buttons[i] = new Button();
+            buttons[i].setDisable(true);
             buttons[i].setMnemonicParsing(true);
-            buttons[i].setText("Rotate X");
+            buttons[i].setText("Save");
             buttons[i].setOnAction(actionEvent -> {
                 if (actionEvent.getSource() == buttons[6]) {
+                    // save as png
+                    //FileChooser is the method to make a dialog to find a place to save the file
+                    FileChooser fc = new FileChooser();
+                    fc.setInitialDirectory(new File(System.getProperty("user.home")));
+                    File f = fc.showSaveDialog(null);
+                    String fileName = f.getAbsolutePath();
 
+                    try {
+                        Utilities.ImageWrite(inBI, outImg, fileName + ".png");
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("File saved in: " + fileName + ".png");
                 }
             });
 
             i = 7;
             buttons[i] = new Button();
+            buttons[i].setDisable(true);
             buttons[i].setMnemonicParsing(true);
             buttons[i].setText("Rotate Y");
             buttons[i].setOnAction(actionEvent -> {
@@ -251,6 +301,7 @@ public class GraphicsJavaFX extends Application {
 
             i = 8;
             buttons[i] = new Button();
+            buttons[i].setDisable(true);
             buttons[i].setMnemonicParsing(true);
             buttons[i].setText("Rotate Z");
             buttons[i].setOnAction(actionEvent -> {
