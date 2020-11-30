@@ -1,3 +1,11 @@
+/*
+Homework 5
+Name: Joseph Audras
+Professor: Dr. Reinhart
+Class: CSC 405-1
+Date due: 3-5-20
+*/
+
 package Main;
 
 import javafx.animation.AnimationTimer;
@@ -18,229 +26,238 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-public class GraphicsJavaFX extends Application
-{
+import java.awt.image.BufferedImage;
+
+public class GraphicsJavaFX extends Application {
     int WIDTH = 512;
-    int HEIGHT = 256;
-    
-    private AnimationTimer animationTimer;
+    int HEIGHT = 512;
+
+    //the loaded image, does not get modified
+    public FrameBuffer inImg;
+    public BufferedImage inBI;
+    //the saving image, this is the modified inImg
+    public FrameBuffer outImg;
+    public BufferedImage outBI;
 
     private Scene mainScene;
-    
-    // -- Main container
     private BorderPane pane;
-    
-    // -- Graphics container
     private GraphicsCanvasInner graphicsCanvas;
-    
-    // -- Controls container
     private ControlBoxInner controlBox;
-    
 
-    @Override
-    public void start(Stage mainStage)
-    {
-    	// -- Application title
-        mainStage.setTitle("JavaFX Graphics Application");
-
-        // -- create canvas for drawing
-        graphicsCanvas = new GraphicsCanvasInner(WIDTH, HEIGHT);
- 
-    	// -- construct the controls
-    	controlBox = new ControlBoxInner();
-         
-        // -- create the primary window structure
-        pane = new BorderPane();
-
-    	// -- add the graphics canvas and the control box to the split pan
-        pane.setLeft(controlBox);
-        pane.setCenter(graphicsCanvas);
-
-        // -- set up key listeners (to Pane) 
-        prepareActionHandlers(pane);
-
-       
-        mainScene = new Scene(pane);
-        mainStage.setScene(mainScene);
-
-        // -- create the animation timer handler
-        animationTimer = new AnimationTimer() {
-            public void handle(long currentNanoTime) {
-                //graphicsCanvas.repaint();
-            	System.out.println("tic");
-            }
-        };
-
-        
-        // -- paint the graphics canvas before the initial display
-        graphicsCanvas.repaint();
-
-        // -- display the application window
-        mainStage.show();
-        
-        // -- set keyboard focus to the pane
-        pane.requestFocus();
-       
-    }
-
-    // -- key handlers belong to the Pane
-    private void prepareActionHandlers(Pane container)
-    {
-        // -- key listeners belong to Pane
-        container.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-            	System.out.println(event.getCode().toString());
-                graphicsCanvas.repaint();
-
-            }
-        });
-        container.setOnKeyReleased(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                graphicsCanvas.repaint();
-            }
-        });
-        
-    }
-    
-
-    // -- launch the application 
     public void launchApp(String[] args)
     {
         launch(args);
     }
 
-    
+    @Override
+    public void start(Stage mainStage) {
+        mainStage.setTitle("Image Processing Application");
+        graphicsCanvas = new GraphicsCanvasInner(WIDTH, HEIGHT);
+        controlBox = new ControlBoxInner();
+
+        pane = new BorderPane();
+        pane.setLeft(controlBox);
+        pane.setCenter(graphicsCanvas);
+
+        prepareActionHandlers(pane);
+        mainScene = new Scene(pane);
+        mainStage.setScene(mainScene);
+
+        graphicsCanvas.repaint();
+        mainStage.show();
+        pane.requestFocus();
+    }
+
+    private void prepareActionHandlers(Pane container) {
+        container.setOnKeyPressed(event -> {
+            System.out.println(event.getCode().toString());
+            graphicsCanvas.repaint();
+        });
+        container.setOnKeyReleased(event -> graphicsCanvas.repaint());
+    }
+
     // -- Inner class for Graphics
     public class GraphicsCanvasInner extends Canvas  {
-    	
-    	private GraphicsContext graphicsContext;
 
-    	private RenderSurface renderSurface;
-    	
-    	public GraphicsCanvasInner(int width, int height)
-    	{
-    		super(width, height);
-    		
-            // -- get the context for drawing on the canvas
+        private GraphicsContext graphicsContext;
+        private RenderSurface renderSurface;
+
+        public GraphicsCanvasInner(int height, int width) {
+            super(height, width);
+
             graphicsContext = this.getGraphicsContext2D();
-
-            // -- set up event handlers for mouse
             prepareActionHandlers();
 
-        	renderSurface = new RenderSurface((int)width, (int)height);
-
-    	}
-    	
-
-    	// -- check the active keys and render graphics
-        public void repaint()
-        {
-        	double height = this.getHeight();
-        	double width = this.getWidth();
- 
-            // -- clear canvas
-            graphicsContext.clearRect(0, 0, width, height);
-
-            graphicsContext.setStroke(Color.RED);
-
-            graphicsContext.drawImage(renderSurface, 0, 0, this.getWidth(), this.getHeight());
+            renderSurface = new RenderSurface((int)height, (int)width);
         }
 
-        private void prepareActionHandlers()
-        {
-        	
-            // -- mouse listeners belong to the canvas
-            this.setOnMousePressed(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                	if (event.getButton() == MouseButton.PRIMARY) {
-                	}
-                	else if (event.getButton() == MouseButton.SECONDARY) {
-                	}
-                	pane.requestFocus();
-                }
-            });
-            this.setOnMouseReleased(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                	if (event.getButton() == MouseButton.PRIMARY) {
-                 	}
-                	else if (event.getButton() == MouseButton.SECONDARY) {
-                	}
-                	pane.requestFocus();
-                	repaint();
-                }
-            });
-        	this.setOnMouseDragged(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                	if (event.getButton() == MouseButton.PRIMARY) {
-                	}
-                	else if (event.getButton() == MouseButton.SECONDARY) {
-                	}
-                	pane.requestFocus();
-                	repaint();
-                }
-            });
+        //update display
+        public void repaint() {
+            double height = this.getHeight();
+            double width = this.getWidth();
 
+            graphicsContext.clearRect(0, 0, height, width);
+            graphicsContext.setStroke(Color.RED);
+            //sc.render(renderSurface.getSurface());
+            graphicsContext.drawImage(renderSurface, 0, 0, this.getHeight(), this.getWidth());
+        }
+
+        private void prepareActionHandlers() {
+            this.setOnMousePressed(event -> {
+                if (event.getButton() == MouseButton.PRIMARY) {
+
+                }
+                else if (event.getButton() == MouseButton.SECONDARY) {
+
+                }
+                pane.requestFocus();
+            });
+            this.setOnMouseReleased(event -> {
+                if (event.getButton() == MouseButton.PRIMARY) {
+                }
+                else if (event.getButton() == MouseButton.SECONDARY) {
+                }
+                pane.requestFocus();
+                repaint();
+            });
+            this.setOnMouseDragged(event -> {
+                if (event.getButton() == MouseButton.PRIMARY) {
+                }
+                else if (event.getButton() == MouseButton.SECONDARY) {
+                }
+                pane.requestFocus();
+                repaint();
+            });
         }
     }
 
-    
+
     // -- Inner class for Controls
     public class ControlBoxInner extends VBox {
 
         private Button buttons[];
-        private int nButtons = 6;
+        private int nButtons = 10;
 
-        private TextField textField;
-        
-        public ControlBoxInner()
-        {
-        	super();
-        	
+        private TextField button0;
+        private TextField button1;
+        private TextField button2;
+
+        public ControlBoxInner() {
+            super();
+
             // -- set up buttons
             prepareButtonHandlers();
 
             // -- add the buttons to an V (vertical) Box (container)
             for (int i = 0; i < buttons.length; ++i) {
-            	this.getChildren().add(buttons[i]);
-            	if (i == 1) {
-            		textField = new TextField();
-            		textField.setMaxWidth(60);
-            		this.getChildren().add(textField);
-            	}
+                this.getChildren().add(buttons[i]);
+                if (i == 0) {
+                    button0 = new TextField();
+                    button0.setMaxWidth(100);
+                    this.getChildren().add(button0); //fixed point
+                } else if (i == 1) {
+                    button1 = new TextField();
+                    button1.setMaxWidth(100);
+                    this.getChildren().add(button1); //angle in degrees
+                } else if (i == 2) {
+                    button2 = new TextField();
+                    button2.setMaxWidth(100);
+                    this.getChildren().add(button2); //scaling / translation
+                }
             }
         }
-        
-        private void prepareButtonHandlers()
-        {
-        	buttons = new Button[nButtons];
-        	for (int i = 0; i < buttons.length; ++i) {
+
+        private void prepareButtonHandlers() {
+            buttons = new Button[nButtons];
+
+            //textboxes and enter buttons
+            for (int i = 0; i < buttons.length; ++i) {
                 buttons[i] = new Button();
                 buttons[i].setMnemonicParsing(true);
-                buttons[i].setText("Button _" + i);        
-                buttons[i].setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent actionEvent) {
-                    	if (actionEvent.getSource() == buttons[0]) {
-                    		animationTimer.start();
-                    	}
-                    	else if (actionEvent.getSource() == buttons[nButtons - 1]) {
-                    		animationTimer.stop();
-                    	}
-                    	else if (actionEvent.getSource() == buttons[1]) {
-                    		System.out.println(textField.getText());
-                    	}
-                    	// -- process the button
-                        System.out.println(actionEvent.getSource().toString());
-                        // -- and return focus back to the pane
-                        pane.requestFocus();
+                buttons[i].setText("Enter box " + i + ":"); //trans (x,y,z) and rotate (deg)
+                buttons[i].setOnAction(actionEvent -> {
+                    if (actionEvent.getSource() == buttons[0]) {
+
                     }
+                    else if (actionEvent.getSource() == buttons[1]) {
+
+                    }
+                    else if (actionEvent.getSource() == buttons[2]) {
+
+                    }
+                    // -- process the button
+                    //System.out.println(actionEvent.getSource().toString());
+                    // -- and return focus back to the pane
+                    pane.requestFocus();
                 });
-        	}
+            }
+
+            //action buttons
+            int i = 3;
+            buttons[i] = new Button();
+            buttons[i].setMnemonicParsing(true);
+            buttons[i].setText("Load");
+            buttons[i].setOnAction(actionEvent -> {
+                if (actionEvent.getSource() == buttons[3]) {
+
+                }
+                // focus back to the pane
+                pane.requestFocus();
+            });
+
+            i = 4;
+            buttons[i] = new Button();
+            buttons[i].setMnemonicParsing(true);
+            buttons[i].setText("Translate");
+            buttons[i].setOnAction(actionEvent -> {
+                if (actionEvent.getSource() == buttons[4]) {
+
+                }
+                // focus back to the pane
+                pane.requestFocus();
+            });
+
+            i = 5;
+            buttons[i] = new Button();
+            buttons[i].setMnemonicParsing(true);
+            buttons[i].setText("Scale");
+            buttons[i].setOnAction(actionEvent -> {
+                if (actionEvent.getSource() == buttons[5]) {
+
+                }
+                // focus back to the pane
+                pane.requestFocus();
+            });
+
+            i = 6;
+            buttons[i] = new Button();
+            buttons[i].setMnemonicParsing(true);
+            buttons[i].setText("Rotate X");
+            buttons[i].setOnAction(actionEvent -> {
+                if (actionEvent.getSource() == buttons[6]) {
+
+                }
+            });
+
+            i = 7;
+            buttons[i] = new Button();
+            buttons[i].setMnemonicParsing(true);
+            buttons[i].setText("Rotate Y");
+            buttons[i].setOnAction(actionEvent -> {
+                if (actionEvent.getSource() == buttons[7]) {
+
+                }
+            });
+
+            i = 8;
+            buttons[i] = new Button();
+            buttons[i].setMnemonicParsing(true);
+            buttons[i].setText("Rotate Z");
+            buttons[i].setOnAction(actionEvent -> {
+                if (actionEvent.getSource() == buttons[8]) {
+
+                }
+            });
         }
     }
 }

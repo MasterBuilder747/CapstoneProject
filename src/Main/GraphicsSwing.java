@@ -16,8 +16,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class GraphicsSwing extends JFrame {
 
-	private final GraphicPanelInner graphicsPanel;
-	private ControlPanelInner controlPanel;
+	int HEIGHT = 512;
+	int WIDTH = 512;
 
 	//the loaded image, does not get modified
 	public FrameBuffer inImg;
@@ -26,10 +26,12 @@ public class GraphicsSwing extends JFrame {
 	public FrameBuffer outImg;
 	public BufferedImage outBI;
 
+	private final GraphicPanelInner graphicsPanel;
+	private ControlPanelInner controlPanel;
+
 	public GraphicsSwing () {
 		setTitle("Capstone Project");
-		int HEIGHT = 512;
-		int WIDTH = 512;
+
 		setSize(WIDTH, HEIGHT);
 		
 		// -- center the frame on the screen
@@ -137,7 +139,6 @@ public class GraphicsSwing extends JFrame {
 		@Override
 		public void mouseMoved(MouseEvent e) {
 			// TODO Auto-generated method stub
-			
 		}
       
 		// -- this override sets the desired size of the JPanel which is
@@ -164,8 +165,6 @@ public class GraphicsSwing extends JFrame {
 			//    but it is really a Graphics2D object. Cast it up since the
 			//    Graphics2D class is more capable
 			Graphics2D graphicsContext = (Graphics2D)g;
-        	int height = this.getHeight();
-        	int width = this.getWidth();
 
         	graphicsContext.drawImage(renderSurface.toImage(), 0, 0, this.getWidth(), this.getHeight(), null);
  		}
@@ -175,7 +174,7 @@ public class GraphicsSwing extends JFrame {
 	public class ControlPanelInner extends JPanel {
 
 		private JButton[] buttons;
-		private int nButtons = 3;
+		private int nButtons = 4;
 
 		JTextField textField;
 
@@ -189,7 +188,7 @@ public class GraphicsSwing extends JFrame {
 				this.add(buttons[i]);
 //				if (i == 1) {
 //					textField = new JTextField();
-//					//textField.setWidth(60);
+//					textField.setWidth(60);
 //					this.add(textField);
 //				}
 			}
@@ -228,6 +227,7 @@ public class GraphicsSwing extends JFrame {
 									graphicsPanel.repaint();
 									graphicsPanel.requestFocus();
 									buttons[1].setEnabled(true);
+									buttons[2].setEnabled(true);
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -242,7 +242,7 @@ public class GraphicsSwing extends JFrame {
 					buttons[i].addActionListener(actionEvent -> {
 						if (actionEvent.getSource() == buttons[1]) {
 							//display the image again
-							buttons[2].setEnabled(true);
+							buttons[3].setEnabled(true);
 							Utilities.copyFrameBuffer(inImg, outImg);
 
 						}
@@ -250,10 +250,23 @@ public class GraphicsSwing extends JFrame {
 				}
 				if (i == 2) {
 					buttons[i] = new JButton();
-					buttons[i].setText("Save Image");
+					buttons[i].setText("Resize Image");
 					buttons[i].setEnabled(false);
 					buttons[i].addActionListener(actionEvent -> {
 						if (actionEvent.getSource() == buttons[2]) {
+							//display the image again
+							buttons[3].setEnabled(true);
+							outImg = new FrameBuffer(inBI.getHeight(), inBI.getWidth());
+
+						}
+					});
+				}
+				if (i == 3) {
+					buttons[i] = new JButton();
+					buttons[i].setText("Save Image");
+					buttons[i].setEnabled(false);
+					buttons[i].addActionListener(actionEvent -> {
+						if (actionEvent.getSource() == buttons[3]) {
 							// save as png
 							//FileChooser is the method to make a dialog to find a place to save the file
 							JFileChooser fc = new JFileChooser();
@@ -270,7 +283,7 @@ public class GraphicsSwing extends JFrame {
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
-								System.out.println("File saved in: " + fileName);
+								System.out.println("File saved in: " + fileName + ".png");
 							}
 						}
 					});
