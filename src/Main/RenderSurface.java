@@ -2,20 +2,23 @@ package Main;
 
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import javafx.scene.paint.Color;
 
 import java.awt.image.BufferedImage;
 
 public class RenderSurface extends WritableImage {
 	
-	private final FrameBuffer surface;
+	private FrameBuffer surface;
 
 	//initial image when starting
-	public RenderSurface(int height, int width) {
-		super(height, width);
-		this.surface = new FrameBuffer(height, width);
-		for (int i = 0; i < height; ++i) {
-			for (int j = 0; j < width; ++j) {
+	public RenderSurface(int width, int height) {
+		super(width, height);
+		this.resizeWindow(width, height);
+	}
+
+	public void resizeWindow(int width, int height) {
+		this.surface = new FrameBuffer(width, height);
+		for (int i = 0; i < width; ++i) {
+			for (int j = 0; j < height; ++j) {
 				surface.writePixel(i, j, new Pixel(255, 0, 0, 0).toInt());
 			}
 		}
@@ -23,7 +26,7 @@ public class RenderSurface extends WritableImage {
 	}
 
 	public void clearSurface() {
-		this.surface.setFill(new Pixel(255, 0, 0, 0).toInt());
+		this.surface.setFill(new Pixel(0, 0, 0, 0).toInt());
 	}
 	
 	public FrameBuffer getSurface() {
@@ -33,14 +36,14 @@ public class RenderSurface extends WritableImage {
 	
     public void insertArray() {
         //Creating a writable image
-    	int height = this.surface.length();
-    	int width = this.surface.length(0);
+    	int width = this.surface.width();
+		int height = this.surface.height();
 
         //getting the pixel writer 
         PixelWriter writer = this.getPixelWriter();
 
-        for(int x = 0; x < height; x++) {
-        	for(int y = 0; y < width; y++) {
+        for(int x = 0; x < width; x++) {
+        	for(int y = 0; y < height; y++) {
            		//this inserts the fb into the screen
 				writer.setArgb(x, y, this.surface.readPixel(x, y));
            	}
@@ -48,11 +51,11 @@ public class RenderSurface extends WritableImage {
     }
 
 	public BufferedImage toImage() {
-		BufferedImage bi = new BufferedImage(surface.length(), surface.length(0), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bi = new BufferedImage(surface.width(), surface.height(), BufferedImage.TYPE_INT_ARGB);
     	
     	// -- prepare output image
-    	for (int i = 0; i < bi.getHeight(); ++i) {
-    	    for (int j = 0; j < bi.getWidth(); ++j) {
+    	for (int i = 0; i < bi.getWidth(); ++i) {
+    	    for (int j = 0; j < bi.getHeight(); ++j) {
     			//int pixel =	(surface[i][j] << 16) | (surface[i][j] << 8) | (surface[i][j]);
 //    			int pixel =	((int)(Math.random() * 255) << 16) | ((int)(Math.random() * 255) << 8) | ((int)(Math.random() * 255));
 				bi.setRGB(i, j, surface.readPixel(i, j));

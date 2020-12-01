@@ -37,9 +37,9 @@ public class ColorConvert {
         return r + ", " + b + ", " + g + ", " + o;
     }
 
-//    public static void main(String[] args) {
-//        System.out.println(new Pixel(255, 255, 255, 255).toInt());
-//        System.out.println(Arrays.toString(ColorConvert.IntToRGB(-1).toArray()));
-//        //System.out.println((int)Long.parseLong(Color.rgb(255, 0, 0, 1.0).toString(), 16));
-//    }
+    public static void main(String[] args) {
+        System.out.println(new Pixel(120, 0, 0, 0).toInt());
+        System.out.println(Arrays.toString(ColorConvert.IntToRGB(0).toArray()));
+        //System.out.println((int)Long.parseLong(Color.rgb(255, 0, 0, 1.0).toString(), 16));
+    }
 }

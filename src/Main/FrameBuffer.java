@@ -6,26 +6,34 @@ public class FrameBuffer {
     //a, r, g, b
     private final int[][] fb;
 
-    public FrameBuffer(int h, int w) {
+    public FrameBuffer(int w, int h) {
         //all values are set to 0 by default
         //Red, Green, Blue, Opacity (all are 0-255, 32 bit in total)
         this.fb = new int[h][w];
     }
+    public FrameBuffer(int[][] a) {
+        //all values are set to 0 by default
+        //Red, Green, Blue, Opacity (all are 0-255, 32 bit in total)
+        this.fb = a;
+    }
 
-    public void writePixel(int x, int y, int p) {
+    public void writePixel(int w, int h, int p) {
         //this writes the doubles into the array
-        this.fb[x][y] = p;
+        this.fb[h][w] = p;
     }
 
-    public int readPixel(int x, int y) {
+    public int readPixel(int w, int h) {
         //this returns the double version of rgb
-        return this.fb[x][y];
+        return this.fb[h][w];
     }
 
-    public int length() {
+    public int height() {
         return this.fb.length;
     }
-    public int length(int i) {
+    public int width() {
+        return this.fb[0].length;
+    }
+    public int width(int i) {
         return this.fb[i].length;
     }
 
@@ -37,7 +45,7 @@ public class FrameBuffer {
     public void setFill(int p) {
         for (int i = 0; i < this.fb.length; i++) {
             for (int j = 0; j < this.fb[0].length; j++) {
-                this.writePixel(i, j, p);
+                this.writePixel(j, i, p);
             }
         }
     }
