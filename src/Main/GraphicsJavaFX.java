@@ -65,6 +65,21 @@ public class GraphicsJavaFX extends Application {
         pane.requestFocus();
     }
 
+    public void restart(int width, int height) {
+        graphicsCanvas = new GraphicsCanvasInner(width, height);
+        controlBox = new ControlBoxInner();
+
+        pane = new BorderPane();
+        pane.setLeft(controlBox);
+        pane.setCenter(graphicsCanvas);
+
+        prepareActionHandlers(pane);
+        mainScene = new Scene(pane);
+
+        graphicsCanvas.repaint();
+        pane.requestFocus();
+    }
+
     private void prepareActionHandlers(Pane container) {
         container.setOnKeyPressed(event -> {
             System.out.println(event.getCode().toString());
@@ -80,7 +95,7 @@ public class GraphicsJavaFX extends Application {
         private RenderSurface renderSurface;
 
         public GraphicsCanvasInner(int width, int height) {
-            super(height, width);
+            super(width, height);
             graphicsContext = this.getGraphicsContext2D();
             prepareActionHandlers();
 
@@ -89,8 +104,8 @@ public class GraphicsJavaFX extends Application {
 
         //update display
         public void repaint() {
-            double height = this.getHeight();
             double width = this.getWidth();
+            double height = this.getHeight();
 
             graphicsContext.clearRect(0, 0, width, height);
             graphicsContext.setStroke(Color.RED);
@@ -99,31 +114,7 @@ public class GraphicsJavaFX extends Application {
         }
 
         private void prepareActionHandlers() {
-            this.setOnMousePressed(event -> {
-                if (event.getButton() == MouseButton.PRIMARY) {
-
-                }
-                else if (event.getButton() == MouseButton.SECONDARY) {
-
-                }
-                pane.requestFocus();
-            });
-            this.setOnMouseReleased(event -> {
-                if (event.getButton() == MouseButton.PRIMARY) {
-                }
-                else if (event.getButton() == MouseButton.SECONDARY) {
-                }
-                pane.requestFocus();
-                repaint();
-            });
-            this.setOnMouseDragged(event -> {
-                if (event.getButton() == MouseButton.PRIMARY) {
-                }
-                else if (event.getButton() == MouseButton.SECONDARY) {
-                }
-                pane.requestFocus();
-                repaint();
-            });
+            //mouse handlers here
         }
     }
 
@@ -229,8 +220,11 @@ public class GraphicsJavaFX extends Application {
                         //set the new rendersurface to that size
                         //write the image on the rendersurface
                         //render it
+                        graphicsCanvas.renderSurface.resize(inImg.width(), inImg.height());
                         graphicsCanvas.renderSurface.clearSurface();
                         Util.copyFrameBuffer(inImg, graphicsCanvas.renderSurface.getSurface());
+//                        System.out.println(graphicsCanvas.renderSurface.getSurface().width() +
+//                                " x " + graphicsCanvas.renderSurface.getSurface().height());
                         graphicsCanvas.renderSurface.insertArray();
                         graphicsCanvas.repaint();
                         graphicsCanvas.requestFocus();

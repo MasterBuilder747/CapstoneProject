@@ -13,16 +13,16 @@ public class RenderSurface extends WritableImage {
 	public RenderSurface(int width, int height) {
 		super(width, height);
 		this.resizeWindow(width, height);
+		this.insertArray();
 	}
 
 	public void resizeWindow(int width, int height) {
 		this.surface = new FrameBuffer(width, height);
 		for (int i = 0; i < width; ++i) {
 			for (int j = 0; j < height; ++j) {
-				surface.writePixel(i, j, new Pixel(255, 0, 0, 0).toInt());
+				this.surface.writePixel(i, j, new Pixel(0, 0, 0, 0).toInt());
 			}
 		}
-		this.insertArray();
 	}
 
 	public void clearSurface() {
@@ -49,6 +49,9 @@ public class RenderSurface extends WritableImage {
            	}
         }
     }
+	public void resize(int width, int height) {
+		this.surface = new FrameBuffer(width, height);
+	}
 
 	public BufferedImage toImage() {
 		BufferedImage bi = new BufferedImage(surface.width(), surface.height(), BufferedImage.TYPE_INT_ARGB);

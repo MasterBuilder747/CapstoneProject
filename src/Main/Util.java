@@ -21,9 +21,9 @@ public class Util {
     }
     */
     public static void copyFrameBuffer(FrameBuffer fb1, FrameBuffer fb2) {
-        if (fb1.height() == fb2.height() && fb1.width(0) == fb2.width(0)) {
-            for (int i = 0; i < fb1.height(); i++) {
-                for (int j = 0; j < fb1.width(0); j++) {
+        if (fb1.height() == fb2.height() && fb1.width() == fb2.width()) {
+            for (int i = 0; i < fb1.width(); i++) {
+                for (int j = 0; j < fb1.height(); j++) {
                     fb2.writePixel(i, j, fb1.readPixel(i, j));
                 }
             }
@@ -31,6 +31,7 @@ public class Util {
             throw new ArrayIndexOutOfBoundsException("FrameBuffer sizes do not match.");
         }
     }
+
     //change one pixel to another color
     public static FrameBuffer colorPixel(FrameBuffer fb, int oldColor, int newColor) {
         FrameBuffer fb2 = new FrameBuffer(fb.width(), fb.height());
@@ -150,8 +151,8 @@ public class Util {
     }
     public static FrameBuffer resizeCanvas(FrameBuffer fb1, int width, int height) {
         FrameBuffer fb2 = new FrameBuffer(width, height);
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
+        for (int i = 0; i < fb1.width(); i++) {
+            for (int j = 0; j < fb1.height(); j++) {
                 fb2.writePixel(i, j, fb1.readPixel(i, j));
             }
         }
